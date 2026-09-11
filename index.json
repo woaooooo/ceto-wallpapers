@@ -1,0 +1,9 @@
+{
+  "images": [
+    { "title": "夕阳海滩", "file": "images/sunset-beach.jpg" },
+    { "title": "雪山晨光", "file": "images/snow-morning.jpg" }
+  ],
+  "videos": [
+    { "title": "赛博城市", "file": "videos/cyber-city.mp4" }
+  ]
+}
