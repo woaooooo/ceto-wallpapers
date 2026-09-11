@@ -1,0 +1,94 @@
+name: Update index.json & Purge CDN
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'index.json'
+      - 'README.md'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate index.json
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+
+            const IMG_EXT = /\.(jpe?g|png|gif|webp|avif|bmp)$/i;
+            const VID_EXT = /\.(mp4|webm|mov|m4v|ogg|ogv)$/i;
+
+            function walk(dir) {
+              let out = [];
+              for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                if (entry.name.startsWith(".")) continue;
+                const full = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                  out = out.concat(walk(full));
+                } else {
+                  out.push(full.replace(/^\.\//, ""));
+                }
+              }
+              return out;
+            }
+
+            const all = walk(".").filter(f =>
+              !f.endsWith("index.json") &&
+              !f.endsWith("README.md")
+            );
+
+            const images = all.filter(f => IMG_EXT.test(f));
+            const videos = all.filter(f => VID_EXT.test(f));
+
+            // 读取现有 index.json，保留已存在的 title
+            let oldMap = {};
+            try {
+              const old = JSON.parse(fs.readFileSync("index.json", "utf8"));
+              [...(old.images || []), ...(old.videos || [])].forEach(it => {
+                if (it.file) oldMap[it.file] = it.title;
+              });
+            } catch (_) {}
+
+            const item = f => ({
+              title: oldMap[f] || path.basename(f, path.extname(f)),
+              file: f
+            });
+
+            const result = {
+              images: images.map(item),
+              videos: videos.map(item)
+            };
+
+            fs.writeFileSync("index.json", JSON.stringify(result, null, 2));
+            console.log(`Generated: ${images.length} images, ${videos.length} videos`);
+          '
+
+      - name: Commit index.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.json
+          if git diff --staged --quiet; then
+            echo "No changes to index.json"
+          else
+            git commit -m "chore: auto-update index.json"
+            git push
+          fi
+
+      - name: Purge jsDelivr CDN
+        run: |
+          echo "Sending purge request..."
+          curl -sS "https://purge.jsdelivr.net/gh/woaooooo/ceto-wallpapers@main/index.json" || true
+          echo ""
+          echo "Done."
