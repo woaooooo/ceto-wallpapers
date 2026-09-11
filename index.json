@@ -1,9 +1,8 @@
 {
   "images": [
-    { "title": "夕阳海滩", "file": "images/sunset-beach.jpg" },
-    { "title": "雪山晨光", "file": "images/snow-morning.jpg" }
+    { "title": "海景", "file": "images/haijing.jpg" },
   ],
   "videos": [
-    { "title": "赛博城市", "file": "videos/cyber-city.mp4" }
+    { "title": "4K古见硝子", "file": "videos/4kgjxz.mp4" }
   ]
 }
