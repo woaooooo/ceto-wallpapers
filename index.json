@@ -1,8 +1,14 @@
 {
   "images": [
-    { "title": "海景", "file": "images/haijing.jpg" }
+    {
+      "title": "海景",
+      "file": "images/haijing.jpg"
+    }
   ],
   "videos": [
-    { "title": "4K古见硝子", "file": "videos/4kgjxz.mp4" }
+    {
+      "title": "4K古见硝子",
+      "file": "videos/4kgjxz.mp4"
+    }
   ]
 }
