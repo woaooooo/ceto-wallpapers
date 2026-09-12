@@ -1,6 +1,10 @@
 {
   "images": [
     {
+      "title": "4k蕾姆",
+      "file": "images/4k蕾姆.png"
+    },
+    {
       "title": "海景",
       "file": "images/haijing.jpg"
     }
